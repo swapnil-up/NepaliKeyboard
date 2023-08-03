@@ -19,10 +19,19 @@ class MainActivity : AppCompatActivity() {
 
         enterButton.setOnClickListener(){
             var transfer=inputView.text.toString()
-            converter(transfer)
+            transfer.toCharArray()
+            converter(transfer, charMapping)
         }
     }
-    fun converter(transfer: String){
-        displayView.text = transfer
+    fun converter(transfer: String, charMap:charMapping):String{
+            val convertedLetter= StringBuilder()
+            for (char in transfer){
+                val nepaliChar = charMap.englishCharacterMap[char.toString().toLowerCase()] ?: char
+                convertedLetter.append(nepaliChar)
+            }
+
+        displayView.text = convertedLetter.toString()
+        return convertedLetter.toString()
+
     }
 }
