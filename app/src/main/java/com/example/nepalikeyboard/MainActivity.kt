@@ -31,27 +31,33 @@ class MainActivity : AppCompatActivity() {
         for (word in words) {
             val transliteratedWord = StringBuilder()
             var currentIndex = 0
+            var currentSyllable = ""
 
             while (currentIndex < word.length) {
-                var foundMatch = false
-                var syllableLength = 4  // Maximum syllable length to check
+                currentSyllable += word[currentIndex]
 
-                while (syllableLength >= 1) {
-                    val subsequence = word.substring(currentIndex, currentIndex + syllableLength)
-                    if (charMapping.englishCharacterMap.containsKey(subsequence)) {
-                        transliteratedWord.append(charMapping.englishCharacterMap[subsequence])
-                        currentIndex += syllableLength
-                        foundMatch = true
-                        break
+                if (currentSyllable.length >= 3) {
+                    if (charMapping.englishCharacterMap.containsKey(currentSyllable)) {
+                        transliteratedWord.append(charMapping.englishCharacterMap[currentSyllable])
+                        currentSyllable = ""
+                    } else {
+                        transliteratedWord.append(charMapping.englishCharacterMap[currentSyllable.substring(0, 2)]
+                            ?: currentSyllable[0])
+                        currentSyllable = currentSyllable.substring(2)
                     }
-                    syllableLength--
+                } else if (currentSyllable.length >= 2) {
+                    if (charMapping.englishCharacterMap.containsKey(currentSyllable)) {
+                        transliteratedWord.append(charMapping.englishCharacterMap[currentSyllable])
+                        currentSyllable = ""
+                    }
                 }
 
-                if (!foundMatch) {
-                    transliteratedWord.append(charMapping.englishCharacterMap[word[currentIndex].toString()]
-                        ?: word[currentIndex])
-                    currentIndex++
-                }
+                currentIndex++
+            }
+
+            if (currentSyllable.isNotEmpty()) {
+                transliteratedWord.append(charMapping.englishCharacterMap[currentSyllable]
+                    ?: currentSyllable)
             }
 
             transliteratedWords.add(transliteratedWord.toString())
@@ -59,4 +65,5 @@ class MainActivity : AppCompatActivity() {
 
         return transliteratedWords.joinToString(" ")
     }
+
 }
