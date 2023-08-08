@@ -17,21 +17,46 @@ class MainActivity : AppCompatActivity() {
         inputView=findViewById(R.id.inputView)
         enterButton=findViewById(R.id.enterButton)
 
-        enterButton.setOnClickListener(){
-            var transfer=inputView.text.toString()
-            transfer.toCharArray()
-            converter(transfer, charMapping)
+        enterButton.setOnClickListener() {
+            val inputText = inputView.text.toString()
+            val transliteratedText = transliterate(inputText)
+            displayView.text = transliteratedText
         }
     }
-    fun converter(transfer: String, charMap:charMapping):String{
-            val convertedLetter= StringBuilder()
-            for (char in transfer){
-                val nepaliChar = charMap.englishCharacterMap[char.toString().toLowerCase()] ?: char
-                convertedLetter.append(nepaliChar)
+    // Transliteration function
+    private fun transliterate(inputText: String): String {
+        val words = inputText.split(" ")
+        val transliteratedWords = mutableListOf<String>()
+
+        for (word in words) {
+            val transliteratedWord = StringBuilder()
+            var currentIndex = 0
+
+            while (currentIndex < word.length) {
+                var foundMatch = false
+                var syllableLength = 4  // Maximum syllable length to check
+
+                while (syllableLength >= 1) {
+                    val subsequence = word.substring(currentIndex, currentIndex + syllableLength)
+                    if (charMapping.englishCharacterMap.containsKey(subsequence)) {
+                        transliteratedWord.append(charMapping.englishCharacterMap[subsequence])
+                        currentIndex += syllableLength
+                        foundMatch = true
+                        break
+                    }
+                    syllableLength--
+                }
+
+                if (!foundMatch) {
+                    transliteratedWord.append(charMapping.englishCharacterMap[word[currentIndex].toString()]
+                        ?: word[currentIndex])
+                    currentIndex++
+                }
             }
 
-        displayView.text = convertedLetter.toString()
-        return convertedLetter.toString()
+            transliteratedWords.add(transliteratedWord.toString())
+        }
 
+        return transliteratedWords.joinToString(" ")
     }
 }
