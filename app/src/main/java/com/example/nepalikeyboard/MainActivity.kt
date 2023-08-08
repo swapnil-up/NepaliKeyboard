@@ -2,20 +2,36 @@ package com.example.nepalikeyboard
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var displayView:TextView
-    private lateinit var inputView:EditText
-    private lateinit var enterButton:Button
+    private lateinit var displayView: TextView
+    private lateinit var inputView: EditText
+    private lateinit var enterButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        displayView=findViewById(R.id.displayView)
-        inputView=findViewById(R.id.inputView)
-        enterButton=findViewById(R.id.enterButton)
+        displayView = findViewById(R.id.displayView)
+        inputView = findViewById(R.id.inputView)
+        enterButton = findViewById(R.id.enterButton)
+
+        // Add TextWatcher to inputView
+        inputView.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val inputText = s.toString()
+                val transliteratedText = transliterate(inputText)
+                displayView.text = transliteratedText
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         enterButton.setOnClickListener() {
             val inputText = inputView.text.toString()
@@ -23,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             displayView.text = transliteratedText
         }
     }
-    // Transliteration function
+
     private fun transliterate(inputText: String): String {
         val words = inputText.split(" ")
         val transliteratedWords = mutableListOf<String>()
